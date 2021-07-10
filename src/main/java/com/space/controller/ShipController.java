@@ -43,7 +43,7 @@ public class ShipController {
         List<Ship> ships = null;
 
         if (name != null) {
-            //ships = shipDao.findAllByFirstName(name);
+            ships = shipDao.findAllByFirstName(name);
 
         } else {
             ships = shipDao.findAll();

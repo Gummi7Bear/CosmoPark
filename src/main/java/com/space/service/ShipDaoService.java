@@ -5,6 +5,7 @@ import com.space.model.ShipType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
@@ -19,7 +20,8 @@ public class ShipDaoService implements ShipDao{
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final String SQL_SELECT_ALL = "SELECT * FROM ship";
-    private final String SQL_SELECT_BY_ID = "SELECT * FROM fix_user WHERE id = ?";
+    private final String SQL_SELECT_BY_ID = "SELECT * FROM ship WHERE id = ?";
+    private final String SQL_SELECT_BY_Name = "SELECT * FROM ship WHERE name like :name";
 
     //DataSource -  sql интерфейс, его объекты предоставляют нам connection.
     @Autowired //чтобы бин dataSource автоматически вставился
@@ -46,12 +48,18 @@ public class ShipDaoService implements ShipDao{
             Integer crewSize = resultSet.getInt("crewSize");
             Double rating = resultSet.getDouble("rating");
 
-            //Ship ship = new Ship(id, name, planet, shipType, prodDate, isUsed, speed, crewSize, rating);
             Ship ship = new Ship(id, name, planet, shipType, prodDate, isUsed, speed, crewSize, rating);
             shipsMap.put(id, ship);
         }
         return shipsMap.get(id);
     };
+
+    @Override
+    public List<Ship> findAllByFirstName(String name) {
+        List<Ship> result =  namedParameterJdbcTemplate.query(SQL_SELECT_BY_Name, new MapSqlParameterSource().addValue("name", "%" + name+ "%"), shipRowMapper);
+        shipsMap.clear();
+        return result;
+    }
 
     @Override
     public List<Ship> findAllByFilters(List<String> filters) {
