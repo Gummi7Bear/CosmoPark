@@ -22,6 +22,7 @@ public class ShipDaoService implements ShipDao{
     private final String SQL_SELECT_ALL = "SELECT * FROM ship";
     private final String SQL_SELECT_BY_ID = "SELECT * FROM ship WHERE id = ?";
     private final String SQL_SELECT_BY_Name = "SELECT * FROM ship WHERE name like :name";
+    private final String SQL_SELECT_BY_Planet = "SELECT * FROM ship WHERE planet like :planet";
 
     //DataSource -  sql интерфейс, его объекты предоставляют нам connection.
     @Autowired //чтобы бин dataSource автоматически вставился
@@ -55,8 +56,15 @@ public class ShipDaoService implements ShipDao{
     };
 
     @Override
-    public List<Ship> findAllByFirstName(String name) {
+    public List<Ship> findAllByName(String name) {
         List<Ship> result =  namedParameterJdbcTemplate.query(SQL_SELECT_BY_Name, new MapSqlParameterSource().addValue("name", "%" + name+ "%"), shipRowMapper);
+        shipsMap.clear();
+        return result;
+    }
+
+    @Override
+    public List<Ship> findAllByPlanet(String planet) {
+        List<Ship> result =  namedParameterJdbcTemplate.query(SQL_SELECT_BY_Planet, new MapSqlParameterSource().addValue("planet", "%" + planet+ "%"), shipRowMapper);
         shipsMap.clear();
         return result;
     }

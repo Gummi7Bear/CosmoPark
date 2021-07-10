@@ -12,5 +12,6 @@ public interface ShipDao extends CrudDao<Ship>{
     int getNumberByFilters(List<String> filters);
     List<Ship> findAllOnPage(List<Ship> ships, Optional<Integer> pageNumber, Optional<Integer> pageSize);
 
-    List<Ship> findAllByFirstName(String name);
+    List<Ship> findAllByName(String name);
+    List<Ship> findAllByPlanet(String planet);
 }
