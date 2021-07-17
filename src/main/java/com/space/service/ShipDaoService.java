@@ -1,5 +1,6 @@
 package com.space.service;
 
+import com.space.controller.ShipOrder;
 import com.space.model.Ship;
 import com.space.model.ShipType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,31 +57,82 @@ public class ShipDaoService implements ShipDao{
     };
 
     @Override
-    public List<Ship> findAllByName(String name) {
-        List<Ship> result =  namedParameterJdbcTemplate.query(SQL_SELECT_BY_Name, new MapSqlParameterSource().addValue("name", "%" + name+ "%"), shipRowMapper);
+    public List<Ship> findAll(String name, String planet, Date after, Date before, Boolean isUsed, Double minSpeed, Double maxSpeed, Integer minCrewSize, Integer maxCrewSize, Double minRating, Double maxRating) {
+
+        String sqlSelectByFilters = " SELECT * FROM ship where name like :name and planet like :planet " +
+                                    " and prodDate between :after and :before " +
+                                    " and speed between :minSpeed and :maxSpeed " +
+                                    " and crewSize between :minCrewSize and :maxCrewSize " +
+                                    " and rating between :minRating and :maxRating ";
+        MapSqlParameterSource mapFilters = new MapSqlParameterSource();
+        mapFilters.addValue("name", "%" + name+ "%");
+        mapFilters.addValue("planet", "%" + planet+ "%");
+        mapFilters.addValue("after", after);
+        mapFilters.addValue("before", before);
+        mapFilters.addValue("minSpeed", minSpeed);
+        mapFilters.addValue("maxSpeed", maxSpeed);
+        mapFilters.addValue("minCrewSize", minCrewSize);
+        mapFilters.addValue("maxCrewSize", maxCrewSize);
+        mapFilters.addValue("minRating", minRating);
+        mapFilters.addValue("maxRating", maxRating);
+
+        List<Ship> result =  namedParameterJdbcTemplate.query(sqlSelectByFilters, mapFilters, shipRowMapper);
         shipsMap.clear();
         return result;
     }
 
-    @Override
-    public List<Ship> findAllByPlanet(String planet) {
-        List<Ship> result =  namedParameterJdbcTemplate.query(SQL_SELECT_BY_Planet, new MapSqlParameterSource().addValue("planet", "%" + planet+ "%"), shipRowMapper);
-        shipsMap.clear();
-        return result;
-    }
-
-    @Override
-    public List<Ship> findAllByFilters(List<String> filters) {
-        return null;
+    public void getOrderShipList (List<Ship> list, ShipOrder order) {
+        if (order.equals(ShipOrder.ID)) {
+            list.sort(new Comparator<Ship>() {
+                @Override
+                public int compare(Ship ship1, Ship ship2) {
+                    if(ship1.getId() - ship2.getId() > 0) return 1;
+                    if(ship1.getId() - ship2.getId() < 0) return -1;
+                    else return 0;
+                }
+            });
+        }
+        else if (order.equals(ShipOrder.SPEED)) {
+            list.sort(new Comparator<Ship>() {
+                @Override
+                public int compare(Ship ship1, Ship ship2) {
+                    if(ship1.getSpeed() - ship2.getSpeed() > 0) return 1;
+                    if(ship1.getSpeed() - ship2.getSpeed() < 0) return -1;
+                    else return 0;
+                }
+            });
+        }
+        else if (order.equals(ShipOrder.DATE)) {
+            list.sort(new Comparator<Ship>() {
+                @Override
+                public int compare(Ship ship1, Ship ship2) {
+                    if(ship1.getProdDate() - ship2.getProdDate() > 0) return 1;
+                    if(ship1.getProdDate() - ship2.getProdDate() < 0) return -1;
+                    else return 0;
+                }
+            });
+        }
+        else if (order.equals(ShipOrder.RATING)){
+            list.sort(new Comparator<Ship>() {
+                @Override
+                public int compare(Ship ship1, Ship ship2) {
+                    if(ship1.getRating() - ship2.getRating() > 0) return 1;
+                    if(ship1.getRating() - ship2.getRating() < 0) return -1;
+                    else return 0;
+                }
+            });
+        }
     }
 
     @Override
     public int getNumberByFilters(List<String> filters) {
+
         return 0;
     }
 
     @Override
     public Optional<Ship> find(Integer id) {
+
         return Optional.empty();
     }
 
@@ -101,23 +153,17 @@ public class ShipDaoService implements ShipDao{
 
     @Override
     public List<Ship> findAll() {
-        List<Ship> result =  template.query(SQL_SELECT_ALL, shipRowMapper);
-        shipsMap.clear();
-        return result;
+        return null;
     }
 
     @Override
-    public List<Ship> findAllOnPage(List<Ship> ships, Optional<Integer> pageNumber, Optional<Integer> pageSize) {
-        int pNumber = pageNumber.orElse(0);
-        int pSize = pageSize.orElse(3);
-
+    public List<Ship> findAllOnPage(List<Ship> ships, Integer pageNumber, Integer pageSize) {
         List<Ship> result = new ArrayList<>();
-        int skip = pNumber * pSize;
+        int skip = pageNumber * pageSize;
 
-        for (int i = skip; i < Math.min(skip + pSize, ships.size()); i++) {
+        for (int i = skip; i < Math.min(skip + pageSize, ships.size()); i++) {
             result.add(ships.get(i));
         }
-
         return result;
     }
 

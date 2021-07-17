@@ -1,17 +1,15 @@
 package com.space.service;
 
+import com.space.controller.ShipOrder;
 import com.space.model.Ship;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 public interface ShipDao extends CrudDao<Ship>{
-    //получать отфильтрованный список кораблей в соответствии с переданными фильтрами
-    List<Ship> findAllByFilters(List<String> filters);
-    //получать количество кораблей, которые соответствуют фильтрам
-    int getNumberByFilters(List<String> filters);
-    List<Ship> findAllOnPage(List<Ship> ships, Optional<Integer> pageNumber, Optional<Integer> pageSize);
 
-    List<Ship> findAllByName(String name);
-    List<Ship> findAllByPlanet(String planet);
+    List<Ship> findAll(String name, String planet, Date after, Date before, Boolean isUsed, Double minSpeed, Double maxSpeed, Integer minCrewSize, Integer maxCrewSize, Double minRating, Double maxRating);
+    int getNumberByFilters(List<String> filters);
+    List<Ship> findAllOnPage(List<Ship> ships,  Integer pageNumber, Integer pageSize);
+    void getOrderShipList (List<Ship> list, ShipOrder order);
 }
