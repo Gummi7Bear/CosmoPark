@@ -1,13 +1,11 @@
 package com.space.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Calendar;
 import java.util.Objects;
 
 @Entity
+@Table(name = "ship")
 public class Ship {
 
     @Id
@@ -16,33 +14,42 @@ public class Ship {
 
     /** Название корабля (до 50 знаков включительно)
      */
+    @Column(name = "name")
     private String name;
 
     /** Планета пребывания (до 50 знаков включительно
      */
+    @Column(name = "planet")
     private String planet;
+
     /**  Тип корабля
      */
+    @Column(name = "shipType")
     private ShipType shipType;
 
     /**  Дата выпуска. Диапазон значений года 2800..3019
      */
+    @Column(name = "prodDate")
     private Long prodDate;
 
     /**  Использованный / новый
      */
+    @Column(name = "isUsed")
     private Boolean isUsed;
 
     /** Максимальная скорость корабля. Диапазон значений 0,01..0,99 включительно.
      */
+    @Column(name = "speed")
     private Double speed;
 
     /**Количество членов экипажа. Диапазон значений 1..9999 включительно.
      */
+    @Column(name = "crewSize")
     private Integer crewSize;
 
     /**Рейтинг корабля
      */
+    @Column(name = "rating")
     private Double rating;
 
     public Ship() {

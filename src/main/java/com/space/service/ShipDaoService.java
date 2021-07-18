@@ -9,21 +9,21 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.util.*;
 
+/**
+В методе findAll используются JdbcTemplate и DAO для изучения темы. Вся остальная работа с данными через Spring Data.
+ */
 @Component
 public class ShipDaoService implements ShipDao{
 
     //Класс JdbcTemplate выполняет SQL-запросы, выполняет итерации по ResultSet и извлекает вызываемые значения, обновляет инструкции и вызовы процедур, “ловит” исключения и транслирует их в исключения, определённые в пакете org.springframwork.dao
     private JdbcTemplate template;
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
-    private final String SQL_SELECT_ALL = "SELECT * FROM ship";
-    private final String SQL_SELECT_BY_ID = "SELECT * FROM ship WHERE id = ?";
-    private final String SQL_SELECT_BY_Name = "SELECT * FROM ship WHERE name like :name";
-    private final String SQL_SELECT_BY_Planet = "SELECT * FROM ship WHERE planet like :planet";
 
     //DataSource -  sql интерфейс, его объекты предоставляют нам connection.
     @Autowired //чтобы бин dataSource автоматически вставился
@@ -57,28 +57,60 @@ public class ShipDaoService implements ShipDao{
     };
 
     @Override
-    public List<Ship> findAll(String name, String planet, Date after, Date before, Boolean isUsed, Double minSpeed, Double maxSpeed, Integer minCrewSize, Integer maxCrewSize, Double minRating, Double maxRating) {
+    public List<Ship> findAll(@RequestParam(value = "name", required = false) Optional<String> name,
+                              @RequestParam(value = "planet", required = false) Optional<String> planet,
+                              @RequestParam(value = "shipType", required = false) Optional<ShipType> shipType,
+                              @RequestParam(value = "after", required = false) Optional<Long> after,
+                              @RequestParam(value = "before", required = false) Optional<Long> before,
+                              @RequestParam(value = "isUsed", required = false) Optional<Boolean> isUsed,
+                              @RequestParam(value = "minSpeed", required = false) Optional<Double> minSpeed,
+                              @RequestParam(value = "maxSpeed", required = false) Optional<Double> maxSpeed,
+                              @RequestParam(value = "minCrewSize", required = false) Optional<Integer> minCrewSize,
+                              @RequestParam(value = "maxCrewSize", required = false) Optional<Integer> maxCrewSize,
+                              @RequestParam(value = "minRating", required = false) Optional<Double> minRating,
+                              @RequestParam(value = "maxRating", required = false) Optional<Double> maxRating) throws Exception{
 
         String sqlSelectByFilters = " SELECT * FROM ship where name like :name and planet like :planet " +
                                     " and prodDate between :after and :before " +
                                     " and speed between :minSpeed and :maxSpeed " +
                                     " and crewSize between :minCrewSize and :maxCrewSize " +
                                     " and rating between :minRating and :maxRating ";
-        MapSqlParameterSource mapFilters = new MapSqlParameterSource();
-        mapFilters.addValue("name", "%" + name+ "%");
-        mapFilters.addValue("planet", "%" + planet+ "%");
-        mapFilters.addValue("after", after);
-        mapFilters.addValue("before", before);
-        mapFilters.addValue("minSpeed", minSpeed);
-        mapFilters.addValue("maxSpeed", maxSpeed);
-        mapFilters.addValue("minCrewSize", minCrewSize);
-        mapFilters.addValue("maxCrewSize", maxCrewSize);
-        mapFilters.addValue("minRating", minRating);
-        mapFilters.addValue("maxRating", maxRating);
 
-        List<Ship> result =  namedParameterJdbcTemplate.query(sqlSelectByFilters, mapFilters, shipRowMapper);
+        Date dateAfter = new GregorianCalendar(2800, 0 , 1).getTime();
+        Date dateBefore = new GregorianCalendar(3019, 11 , 31).getTime();
+        Date beforeNew = before.isPresent() ? new Date(before.get() -3600001L) : new Date(dateBefore.getTime());
+
+        MapSqlParameterSource mapFilters = new MapSqlParameterSource();
+        mapFilters.addValue("name", "%" + name.orElse("") + "%");
+        mapFilters.addValue("planet", "%" + planet.orElse("") + "%");
+        mapFilters.addValue("after", new Date(after.orElse(dateAfter.getTime())));
+        mapFilters.addValue("before", beforeNew);
+        mapFilters.addValue("minSpeed", minSpeed.orElse(0.01));
+        mapFilters.addValue("maxSpeed", maxSpeed.orElse(0.99));
+        mapFilters.addValue("minCrewSize", minCrewSize.orElse(1));
+        mapFilters.addValue("maxCrewSize", maxCrewSize.orElse(9999));
+        mapFilters.addValue("minRating", minRating.orElse(0.0));
+        mapFilters.addValue("maxRating", maxRating.orElse(80.0));
+
+        List<Ship> ships =  namedParameterJdbcTemplate.query(sqlSelectByFilters, mapFilters, shipRowMapper);
         shipsMap.clear();
-        return result;
+
+        if(shipType.isPresent())
+            for (int i = 0; i < ships.size(); i++) {
+                if(!ships.get(i).getShipType().equals(shipType.get())) {
+                    ships.remove(i);
+                    i--;
+                }
+            }
+
+        if(isUsed.isPresent())
+            for (int i = 0; i < ships.size(); i++) {
+                if(!ships.get(i).getUsed().equals(isUsed.get())) {
+                    ships.remove(i);
+                    i--;
+                }
+            }
+        return ships;
     }
 
     public void getOrderShipList (List<Ship> list, ShipOrder order) {
@@ -125,12 +157,6 @@ public class ShipDaoService implements ShipDao{
     }
 
     @Override
-    public int getNumberByFilters(List<String> filters) {
-
-        return 0;
-    }
-
-    @Override
     public Optional<Ship> find(Integer id) {
 
         return Optional.empty();
@@ -166,5 +192,4 @@ public class ShipDaoService implements ShipDao{
         }
         return result;
     }
-
 }
