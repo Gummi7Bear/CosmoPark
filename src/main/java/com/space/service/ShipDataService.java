@@ -39,7 +39,7 @@ public class ShipDataService implements ShipData{
 
     @Override
     public void delete(Integer id) {
-
+             shipRepository.deleteById((long) id);
     }
 
     @Override

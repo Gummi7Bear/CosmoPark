@@ -3,6 +3,7 @@ package com.space.controller;
 import com.space.model.Ship;
 import com.space.service.ShipData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -30,4 +31,26 @@ public class ShipDataController {
         else
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+    @ResponseBody
+    @RequestMapping(path ="/rest/ships/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<HttpStatus> deleteShip(@PathVariable ("id") int id) {
+
+        ResponseEntity<HttpStatus> responseEntity;
+
+        if(id <= 0 ) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        else {
+            try {
+                shipData.delete(id);
+                responseEntity = new ResponseEntity<>(HttpStatus.OK);
+            }
+            catch (EmptyResultDataAccessException e) {
+                responseEntity = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }
+        return responseEntity;
+    }
+
 }
