@@ -1,7 +1,7 @@
 package com.space.model;
 
 import javax.persistence.*;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -24,13 +24,14 @@ public class Ship {
 
     /**  Тип корабля
      */
+    @Enumerated(EnumType.STRING)
     @Column(name = "shipType")
     private ShipType shipType;
 
     /**  Дата выпуска. Диапазон значений года 2800..3019
      */
     @Column(name = "prodDate")
-    private Long prodDate;
+    private Date prodDate;
 
     /**  Использованный / новый
      */
@@ -55,7 +56,7 @@ public class Ship {
     public Ship() {
     }
 
-    public Ship(Long id, String name, String planet, ShipType shipType, Long prodDate, Boolean isUsed, Double speed, Integer crewSize, Double rating) {
+    public Ship(Long id, String name, String planet, ShipType shipType, Date prodDate, Boolean isUsed, Double speed, Integer crewSize, Double rating) {
         this.id = id;
         this.name = name;
         this.planet = planet;
@@ -83,7 +84,7 @@ public class Ship {
         this.shipType = shipType;
     }
 
-    public void setProdDate(Long prodDate) {
+    public void setProdDate(Date prodDate) {
         this.prodDate = prodDate;
     }
 
@@ -119,7 +120,7 @@ public class Ship {
         return shipType;
     }
 
-    public Long getProdDate() {
+    public Date getProdDate() {
         return prodDate;
     }
 
@@ -137,28 +138,6 @@ public class Ship {
 
     public Double getRating() {
         return rating;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Ship that = (Ship) o;
-        Calendar calendarThis = Calendar.getInstance();
-        calendarThis.setTimeInMillis(prodDate);
-        int prodYearThis = calendarThis.get(Calendar.YEAR);
-        Calendar calendarThat = Calendar.getInstance();
-        calendarThat.setTimeInMillis(that.prodDate);
-        int prodYearThat = calendarThat.get(Calendar.YEAR);
-        return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(planet, that.planet) &&
-                shipType == that.shipType &&
-                Objects.equals(prodYearThis, prodYearThat) &&
-                Objects.equals(isUsed, that.isUsed) &&
-                Objects.equals(speed, that.speed) &&
-                Objects.equals(crewSize, that.crewSize) &&
-                Objects.equals(rating, that.rating);
     }
 
     @Override

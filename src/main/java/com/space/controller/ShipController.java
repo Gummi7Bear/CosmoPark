@@ -40,13 +40,13 @@ public class ShipController {
 
         List<Ship> ships = shipDao.findAll(name, planet, shipType, after, before, isUsed, minSpeed, maxSpeed, minCrewSize, maxCrewSize, minRating, maxRating);
 
-        if (ships.size() == 0) {
+        if (ships.size() == 0)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
 
-        if (order.isPresent()) {
+
+        if (order.isPresent())
             shipDao.getOrderShipList(ships, order.get());
-        }
+
 
         List<Ship> shipsOnPage = shipDao.findAllOnPage(ships, pageNumber.orElse(0), pageSize.orElse(3));
         return new ResponseEntity<>(shipsOnPage, HttpStatus.OK);
@@ -68,9 +68,9 @@ public class ShipController {
 
         List<Ship> ships = shipDao.findAll(name, planet, shipType, after, before, isUsed, minSpeed, maxSpeed, minCrewSize, maxCrewSize, minRating, maxRating);
 
-        if (ships.size() == 0) {
+        if (ships.size() == 0)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
 
         return new ResponseEntity<>(ships.size(), HttpStatus.OK);
     }

@@ -44,7 +44,7 @@ public class ShipDaoService implements ShipDao{
             String name = resultSet.getString("name");
             String planet = resultSet.getString("planet");
             ShipType shipType = ShipType.valueOf(resultSet.getString("shipType"));
-            Long prodDate = resultSet.getDate("prodDate").getTime();
+            Date prodDate = resultSet.getDate("prodDate");
             Boolean isUsed = resultSet.getBoolean("isUsed");
             Double speed = resultSet.getDouble("speed");
             Integer crewSize = resultSet.getInt("crewSize");
@@ -138,8 +138,8 @@ public class ShipDaoService implements ShipDao{
             list.sort(new Comparator<Ship>() {
                 @Override
                 public int compare(Ship ship1, Ship ship2) {
-                    if(ship1.getProdDate() - ship2.getProdDate() > 0) return 1;
-                    if(ship1.getProdDate() - ship2.getProdDate() < 0) return -1;
+                    if(ship1.getProdDate().getTime() - ship2.getProdDate().getTime() > 0) return 1;
+                    if(ship1.getProdDate().getTime() - ship2.getProdDate().getTime() < 0) return -1;
                     else return 0;
                 }
             });
