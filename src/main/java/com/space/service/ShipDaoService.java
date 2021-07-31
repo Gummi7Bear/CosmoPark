@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.util.*;
 
 /**
-В методе findAll используются JdbcTemplate и DAO для изучения темы. Вся остальная работа с данными через Spring Data.
+В методе findAll используются JdbcTemplate, NamedParameterJdbcTemplate и DAO для изучения темы. Вся остальная работа с данными через Spring Data.
  */
 @Component
 public class ShipDaoService implements ShipDao{
@@ -157,32 +157,6 @@ public class ShipDaoService implements ShipDao{
     }
 
     @Override
-    public Optional<Ship> find(Integer id) {
-
-        return Optional.empty();
-    }
-
-    @Override
-    public void save(Ship model) {
-
-    }
-
-    @Override
-    public void update(Ship model) {
-
-    }
-
-    @Override
-    public void delete(Integer id) {
-
-    }
-
-    @Override
-    public List<Ship> findAll() {
-        return null;
-    }
-
-    @Override
     public List<Ship> findAllOnPage(List<Ship> ships, Integer pageNumber, Integer pageSize) {
         List<Ship> result = new ArrayList<>();
         int skip = pageNumber * pageSize;
@@ -191,5 +165,19 @@ public class ShipDaoService implements ShipDao{
             result.add(ships.get(i));
         }
         return result;
+    }
+
+    @Override
+    public void save(Ship model) {}
+
+    @Override
+    public void update(Ship model) {}
+
+    @Override
+    public void delete(Integer id) {}
+
+    @Override
+    public List<Ship> findAll() {
+        return null;
     }
 }
