@@ -61,4 +61,20 @@ public class ShipDataController {
            return shipData.save(dataParams);
         }
     }
+
+    @RequestMapping(path = "/rest/ships/{id}", method = RequestMethod.POST)
+    public ResponseEntity<Ship> updateShip(@PathVariable("id") int id, @RequestBody DataParams dataParams) {
+
+        if (id <= 0)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Optional<Ship> ship = shipData.find(id);
+
+        if(ship.isPresent() && dataParams.isEmptyBody())
+            return new ResponseEntity<>(ship.get(), HttpStatus.OK);
+        else if (ship.isPresent())
+            return shipData.update(ship.get(), dataParams);
+        else
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 }

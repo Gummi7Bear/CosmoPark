@@ -14,14 +14,14 @@ public class DataParams {
     public DataParams() {
     }
 
-    public DataParams(String name, String planet, ShipType shipType, Long prodDate, Optional<Boolean> isUsed, Double speed, Integer crewSize) {
-        this.name = name;
-        this.planet = planet;
-        this.shipType = shipType;
-        this.prodDate = prodDate;
-        this.isUsed = isUsed.get();
-        this.speed = speed;
-        this.crewSize = crewSize;
+    public DataParams(Optional<String> name, Optional<String> planet, Optional<ShipType> shipType, Optional<Long> prodDate, Optional<Boolean> isUsed, Optional<Double> speed, Optional<Integer> crewSize) {
+        this.name = name.isPresent() ? name.get() : null;
+        this.planet = planet.isPresent() ? planet.get() : null;
+        this.shipType = shipType.isPresent() ? shipType.get() : null;
+        this.prodDate = prodDate.isPresent() ? prodDate.get() : null;
+        this.isUsed = isUsed.isPresent() ? isUsed.get() : null;
+        this.speed = speed.isPresent() ? speed.get() : null;
+        this.crewSize = crewSize.isPresent() ? crewSize.get() : null;
     }
 
     public String getName() {
@@ -82,5 +82,9 @@ public class DataParams {
 
     public boolean isValid() {
         return this.name != null && this.planet != null && this.shipType != null && this.crewSize != null && this.prodDate != null && this.prodDate != null && this.speed != null;
+    }
+
+    public boolean isEmptyBody() {
+        return this.name == null && this.planet == null && this.shipType == null && this.crewSize == null && this.prodDate == null && this.prodDate == null && this.speed == null;
     }
 }
